@@ -1,0 +1,115 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! Saya chatbot Keripik Talas Amiku 😊\nAda yang bisa saya bantu?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "89d54ed7-42d0-443d-960b-a1df5e6a7884",
+      "name": "When chat message received",
+      "webhookId": "6e99792b-8f97-452f-ac22-8ebb262619ef"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "7d6d232f-fb73-4428-be18-076a85871324",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VQIxKqZTw3efaW0L",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "6cf18c21-f2f1-4609-bd26-50081d7362be",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah chatbot customer service untuk produk Keripik Talas Amiku.\n\nTugas kamu adalah menjawab pertanyaan pelanggan mengenai:\n- varian rasa\n- harga\n- bahan baku\n- keunggulan produk\n- cara pemesanan\n\nJawablah dengan ramah, singkat, dan jelas seperti customer service profesional.\nGunakan bahasa Indonesia yang sopan.\nJika pertanyaan di luar topik, arahkan kembali ke produk Keripik Talas Amiku."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d23edd9a-06c3-47a3-aec4-e6a56211ad6a",
+      "name": "AI Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ecf0ddd4-4598-4f5b-b983-3ba45c077f12",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "304abcdaf2fdb88769630a74bb7a2e51a4188186dc73e71f54d905ef7f7b020b"
+  },
+  "id": "Q469yLsInQ2zBbTC",
+  "tags": []
+}
