@@ -1,0 +1,155 @@
+{
+  "name": "webbotAI",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "328cb2ad-6162-489b-8ac1-806f84fd36a3",
+      "name": "When chat message received",
+      "webhookId": "51b9c561-a91b-4cc7-a917-75169a3715b8"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten penjualan Keripik Talas Amiku.\n\nTugas kamu adalah menjawab pertanyaan tentang produk dan harga berdasarkan data dari Google Sheets menggunakan tool \"Get row(s) in sheet in Google Sheets\".\n\nGunakan hanya data dari Google Sheets.\nJangan mengarang jawaban.\n\nJika data tidak ditemukan, jawab:\n\"Maaf, produk tidak ditemukan.\"\n\nJawab dengan ramah dan santai seperti penjual."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "191f64bd-16d9-47da-a742-cff50f300185",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        192
+      ],
+      "id": "088e47e4-7bb9-4379-a072-9b98f4f317d2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VQIxKqZTw3efaW0L",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        176
+      ],
+      "id": "87913fde-bbf3-4193-9a82-e14538b382bc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/19oxylcNsLs4QOw8CT-PCeT3lgutwwO6zlbc-VxZo-QQ/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        208
+      ],
+      "id": "0deecb0d-0e16-439d-a95a-a9b90f5ed648",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mKvfHHLhl8i1NkCJ",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "08109b06-56c6-4fdd-a1cf-f26d78025574",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "304abcdaf2fdb88769630a74bb7a2e51a4188186dc73e71f54d905ef7f7b020b"
+  },
+  "id": "kRlNYCVoZw0l7qak",
+  "tags": []
+}
