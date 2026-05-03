@@ -1,0 +1,418 @@
+{
+  "name": "RAG2-tugas5",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1WM1iqiazGvfwOXJhVEtuFzEFAssnrqDE",
+          "mode": "list",
+          "cachedResultName": "Rag2",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WM1iqiazGvfwOXJhVEtuFzEFAssnrqDE"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "91056421-c812-4057-b61a-70bb0781c4a0",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "lUNquiEv6sq653XX",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f921a4e0-e3c0-4d22-9ee6-2dfc15aa2873",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c56777f5-87ce-432e-9d46-f983993c41a8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "2ddeba93-c22c-469f-a48c-7848f7c067a3",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "lUNquiEv6sq653XX",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "9dc92d42-ac0a-42c4-a5e8-82e5dc2f6dd9",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "dbfa38c5-6107-451d-a5d9-4d73e3f3ac84",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uoCkG4CI6a5QEdaJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $('Edit Fields').item.json.file_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        208
+      ],
+      "id": "541b33dc-1cc2-4641-86f9-8a08273121b3",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        944,
+        400
+      ],
+      "id": "c1dfc3b7-ce2e-42a9-9bba-39740b4efcca",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        304
+      ],
+      "id": "c117427a-c6f7-4960-a7e8-f6ca5b85ee99",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VQIxKqZTw3efaW0L",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hallo!👋\n Saya adalah asisten AI untuk Panduan Penulisan Ilmiah Tugas Akhir. Anda bisa bertanya kepada saya mengenai aturan Bab I hingga Bab V, kriteria judul, hingga standar daftar referensi IEEE. Ada yang bisa saya bantu?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        464
+      ],
+      "id": "93e03c4a-33d8-470a-b8f0-30342f8c0a42",
+      "name": "When chat message received",
+      "webhookId": "19ab1ea9-b3bf-49b6-bd99-1a0ba9477fe4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Saya adalah Asisten Akademik yang bertugas membantu mahasiswa memahami aturan penulisan Tugas Akhir berdasarkan dokumen panduan.\n\nAturan Utama:\n1. Jawab hanya berdasarkan konteks dokumen yang diberikan.\n2. Jika tidak ada di dokumen, arahkan mahasiswa untuk berkonsultasi dengan Dosen Pembimbing.\n3. Kriteria Judul: Harus mengandung Kata Benda Pekerjaan, Objek, dan Metode[cite: 3].\n4. Referensi: Wajib minimal 15 sumber, terbitan 5 tahun terakhir, dan minimal 2 dari dosen internal[cite: 34].\n5. Sitasi: Wajib menggunakan standar IEEE[cite: 42].\n6. Gaya Bahasa: Formal, edukatif, dan to-the-point.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        464
+      ],
+      "id": "a99d057d-ec27-4ab2-9415-191ae425a81c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        672
+      ],
+      "id": "510bbe96-ff67-4f61-91a4-7b8445ac2e6c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VQIxKqZTw3efaW0L",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Panggil Tool Supabase Vector ini untuk mendapatkan informasi Panduan Penulisan Ilmiah Tugas Akhir, yang mencakup aturan sistematika Bab I-V, kriteria judul, format abstrak, dan standar referensi IEEE.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        672
+      ],
+      "id": "3bc8b030-4d7d-4ea7-a56f-1978e95d4a30",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uoCkG4CI6a5QEdaJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        672
+      ],
+      "id": "aef108db-54c6-4918-b214-30000e2908ce",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "db62ce73-b4b2-4558-903b-fa0a4bd79334",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "304abcdaf2fdb88769630a74bb7a2e51a4188186dc73e71f54d905ef7f7b020b"
+  },
+  "id": "gb0N0S98iFbVAlm5",
+  "tags": []
+}
